@@ -1,0 +1,281 @@
+<html>
+<head>
+<title>MostAnagramsFinder.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #5f826b; font-style: italic;}
+.s4 { color: #67a37c; font-style: italic;}
+.s5 { color: #7a7e85;}
+.s6 { color: #2aacb8;}
+.s7 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+MostAnagramsFinder.java</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Arrays</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Iterator</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">io</span><span class="s2">.*;</span>
+<span class="s3">/**</span>
+ <span class="s3">* Class that parses through a .txt fileand finds the word or words with the most anagrams</span>
+ <span class="s3">*</span>
+ <span class="s3">* </span><span class="s4">@author </span><span class="s3">Elijah Espinal</span>
+ <span class="s3">* </span><span class="s4">@date </span><span class="s3">5/7/2024</span>
+ <span class="s3">*/</span>
+
+<span class="s0">public class </span><span class="s1">MostAnagramsFinder </span><span class="s2">{</span>
+    <span class="s3">/**</span>
+     <span class="s3">* The main method for the MostAnagramsFinder program.</span>
+     <span class="s3">* Checks Command Line Arguments</span>
+     <span class="s3">* Throws an IOException</span>
+     <span class="s3">*/</span>
+
+    <span class="s0">public static void </span><span class="s1">main</span><span class="s2">(</span><span class="s1">String</span><span class="s2">[] </span><span class="s1">args</span><span class="s2">) </span><span class="s0">throws </span><span class="s1">IOException </span><span class="s2">{</span>
+        <span class="s5">//Parse the command line arguments</span>
+        <span class="s5">// Check if the number of arguments provided is correct</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">args</span><span class="s2">.</span><span class="s1">length </span><span class="s2">!= </span><span class="s6">2</span><span class="s2">) {</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;Usage: java MostAnagramsFinder &lt;dictionary file&gt; &lt;bst|rbt|hash&gt;&quot;</span><span class="s2">);</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s6">1</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">String dictionaryFile </span><span class="s2">= </span><span class="s1">args</span><span class="s2">[</span><span class="s6">0</span><span class="s2">];</span>
+        <span class="s1">File file </span><span class="s2">= </span><span class="s0">new </span><span class="s1">File</span><span class="s2">(</span><span class="s1">dictionaryFile</span><span class="s2">);</span>
+
+
+        <span class="s5">// Check if the dictionary file exists</span>
+        <span class="s0">if </span><span class="s2">(!</span><span class="s1">file</span><span class="s2">.</span><span class="s1">exists</span><span class="s2">()) {</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;Error: Cannot open file '&quot; </span><span class="s2">+ </span><span class="s1">args</span><span class="s2">[</span><span class="s6">0</span><span class="s2">] + </span><span class="s7">&quot;' for input.&quot;</span><span class="s2">);</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s6">1</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s1">String dataStructure </span><span class="s2">= </span><span class="s1">args</span><span class="s2">[</span><span class="s6">1</span><span class="s2">];</span>
+        <span class="s1">MyMap</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">map </span><span class="s2">= </span><span class="s0">null</span><span class="s2">;</span>
+
+        <span class="s5">//Parse the command lne to instantiate the appropriate data structure</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">dataStructure</span><span class="s2">.</span><span class="s1">equals</span><span class="s2">(</span><span class="s7">&quot;bst&quot;</span><span class="s2">)) {</span>
+            <span class="s1">map </span><span class="s2">= </span><span class="s0">new </span><span class="s1">BSTreeMap</span><span class="s2">&lt;&gt;();</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">dataStructure</span><span class="s2">.</span><span class="s1">equals</span><span class="s2">(</span><span class="s7">&quot;rbt&quot;</span><span class="s2">)) {</span>
+            <span class="s1">map </span><span class="s2">= </span><span class="s0">new </span><span class="s1">RBTreeMap</span><span class="s2">&lt;&gt;();</span>
+        <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">dataStructure</span><span class="s2">.</span><span class="s1">equals</span><span class="s2">(</span><span class="s7">&quot;hash&quot;</span><span class="s2">)) {</span>
+            <span class="s1">map </span><span class="s2">= </span><span class="s0">new </span><span class="s1">MyHashMap</span><span class="s2">&lt;&gt;();</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;Error: Invalid data structure '&quot; </span><span class="s2">+ </span><span class="s1">args</span><span class="s2">[</span><span class="s6">1</span><span class="s2">] + </span><span class="s7">&quot;' received.&quot;</span><span class="s2">);</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s6">1</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s5">//Try to populate map</span>
+        <span class="s0">try </span><span class="s2">{</span>
+            <span class="s1">populateMap</span><span class="s2">(</span><span class="s1">dictionaryFile</span><span class="s2">, </span><span class="s1">map</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">catch </span><span class="s2">(</span><span class="s1">IOException e</span><span class="s2">) {</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">err</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;Error: An I/O error occurred reading '&quot; </span><span class="s2">+ </span><span class="s1">args</span><span class="s2">[</span><span class="s6">0</span><span class="s2">] + </span><span class="s7">&quot;'.&quot;</span><span class="s2">);</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">exit</span><span class="s2">(</span><span class="s6">1</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s5">//Call the function that displays the output</span>
+        <span class="s1">findMostAnagrams</span><span class="s2">(</span><span class="s1">map</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* instantiates map based on data structure chosen by user</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">dataStructure the chosen data structure the user decides</span>
+     <span class="s3">* </span><span class="s4">@return </span><span class="s3">new Map type correlated with data structure or null if user did not type in bst,hash,rbt</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static </span><span class="s1">MyMap</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">createMap</span><span class="s2">(</span><span class="s1">String dataStructure</span><span class="s2">) {</span>
+        <span class="s5">//Use switch-cases to designate what map should be created based on the input data structure</span>
+        <span class="s0">switch </span><span class="s2">(</span><span class="s1">dataStructure</span><span class="s2">) {</span>
+            <span class="s0">case </span><span class="s7">&quot;bst&quot;</span><span class="s2">:</span>
+                <span class="s0">return new </span><span class="s1">BSTreeMap</span><span class="s2">&lt;&gt;();</span>
+            <span class="s0">case </span><span class="s7">&quot;rbt&quot;</span><span class="s2">:</span>
+                <span class="s0">return new </span><span class="s1">RBTreeMap</span><span class="s2">&lt;&gt;();</span>
+            <span class="s0">case </span><span class="s7">&quot;hash&quot;</span><span class="s2">:</span>
+                <span class="s0">return new </span><span class="s1">MyHashMap</span><span class="s2">&lt;&gt;();</span>
+            <span class="s0">default</span><span class="s2">:</span>
+                <span class="s0">return null</span><span class="s2">;</span>
+        <span class="s2">}</span>
+
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* Populates the map with words from the dictionary file.</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">dictionaryFileName The name of the dictionary file.</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">map                The map data structure.</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">args               Command line arguments.</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static void </span><span class="s1">populateMap</span><span class="s2">(</span><span class="s1">String file</span><span class="s2">, </span><span class="s1">MyMap</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">map</span><span class="s2">) </span><span class="s0">throws </span><span class="s1">IOException </span><span class="s2">{</span>
+        <span class="s0">try </span><span class="s2">(</span><span class="s1">BufferedReader reader </span><span class="s2">= </span><span class="s0">new </span><span class="s1">BufferedReader</span><span class="s2">(</span><span class="s0">new </span><span class="s1">FileReader</span><span class="s2">(</span><span class="s1">file</span><span class="s2">))) {</span>
+            <span class="s1">String line</span><span class="s2">;</span>
+            <span class="s0">while </span><span class="s2">((</span><span class="s1">line </span><span class="s2">= </span><span class="s1">reader</span><span class="s2">.</span><span class="s1">readLine</span><span class="s2">()) != </span><span class="s0">null</span><span class="s2">) {</span>
+                <span class="s1">String word </span><span class="s2">= </span><span class="s1">line</span><span class="s2">.</span><span class="s1">trim</span><span class="s2">().</span><span class="s1">toLowerCase</span><span class="s2">();</span>
+                <span class="s1">String sortedWord </span><span class="s2">= </span><span class="s1">sortChars</span><span class="s2">(</span><span class="s1">word</span><span class="s2">);</span>
+
+                <span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">anagramsList </span><span class="s2">= </span><span class="s1">map</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">sortedWord</span><span class="s2">);</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">anagramsList </span><span class="s2">== </span><span class="s0">null</span><span class="s2">) {</span>
+                    <span class="s1">anagramsList </span><span class="s2">= </span><span class="s0">new </span><span class="s1">MyLinkedList</span><span class="s2">&lt;&gt;();</span>
+                    <span class="s1">map</span><span class="s2">.</span><span class="s1">put</span><span class="s2">(</span><span class="s1">sortedWord</span><span class="s2">, </span><span class="s1">anagramsList</span><span class="s2">);</span>
+                <span class="s2">}</span>
+                <span class="s5">//Adds original version of word to ensure capitalization is preserved</span>
+                <span class="s1">anagramsList</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">line</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* Sorts the characters of a word lexicographically.</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">arr: the input word in the form of an array of charachters's</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static void </span><span class="s1">insertionSort</span><span class="s2">(</span><span class="s0">char</span><span class="s2">[] </span><span class="s1">arr</span><span class="s2">) {</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">idx </span><span class="s2">= </span><span class="s6">1</span><span class="s2">; </span><span class="s1">idx </span><span class="s2">&lt; </span><span class="s1">arr</span><span class="s2">.</span><span class="s1">length</span><span class="s2">; </span><span class="s1">idx</span><span class="s2">++) {</span>
+            <span class="s0">char </span><span class="s1">temp </span><span class="s2">= </span><span class="s1">arr</span><span class="s2">[</span><span class="s1">idx</span><span class="s2">];</span>
+            <span class="s0">int </span><span class="s1">j </span><span class="s2">= </span><span class="s1">idx </span><span class="s2">- </span><span class="s6">1</span><span class="s2">;</span>
+            <span class="s0">while </span><span class="s2">(</span><span class="s1">j </span><span class="s2">&gt;= </span><span class="s6">0 </span><span class="s2">&amp;&amp; </span><span class="s1">arr</span><span class="s2">[</span><span class="s1">j</span><span class="s2">] &gt; </span><span class="s1">temp</span><span class="s2">) {</span>
+                <span class="s1">arr</span><span class="s2">[</span><span class="s1">j </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">] = </span><span class="s1">arr</span><span class="s2">[</span><span class="s1">j</span><span class="s2">];</span>
+                <span class="s1">j</span><span class="s2">--;</span>
+            <span class="s2">}</span>
+            <span class="s1">arr</span><span class="s2">[</span><span class="s1">j </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">] = </span><span class="s1">temp</span><span class="s2">;</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* Finalizes creation of key mapping for an input word. Works with insertionsort(char[arr]</span>
+     <span class="s3">* to ensure that a word becomes its key by being completely lowercase and in alphabetical order.</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">line: word that is taken in to parse into key</span>
+     <span class="s3">* </span><span class="s4">@return </span><span class="s3">String of the key to be inserted in populateMap</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static </span><span class="s1">String sortChars</span><span class="s2">(</span><span class="s1">String line</span><span class="s2">) {</span>
+        <span class="s5">//finish creating the key: make lowercase and sort letters alphabetically</span>
+        <span class="s0">char</span><span class="s2">[] </span><span class="s1">arr </span><span class="s2">= </span><span class="s1">line</span><span class="s2">.</span><span class="s1">toLowerCase</span><span class="s2">().</span><span class="s1">toCharArray</span><span class="s2">();</span>
+        <span class="s1">insertionSort</span><span class="s2">(</span><span class="s1">arr</span><span class="s2">);</span>
+        <span class="s0">return new </span><span class="s1">String</span><span class="s2">(</span><span class="s1">arr</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* Performs insertionSort on the groups of anagrams to ensure</span>
+     <span class="s3">* that the words in each group are alphabetically sorted with capitalized letters first</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">group: list of anagrams in one group</span>
+     <span class="s3">*/</span>
+
+    <span class="s0">private static void </span><span class="s1">insertionSort</span><span class="s2">(</span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">group</span><span class="s2">) {</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">idx </span><span class="s2">= </span><span class="s6">1</span><span class="s2">; </span><span class="s1">idx </span><span class="s2">&lt; </span><span class="s1">group</span><span class="s2">.</span><span class="s1">size</span><span class="s2">(); </span><span class="s1">idx</span><span class="s2">++) {</span>
+            <span class="s1">String line </span><span class="s2">= </span><span class="s1">group</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">idx</span><span class="s2">);</span>
+            <span class="s0">int </span><span class="s1">j </span><span class="s2">= </span><span class="s1">idx </span><span class="s2">- </span><span class="s6">1</span><span class="s2">;</span>
+            <span class="s0">while </span><span class="s2">(</span><span class="s1">j </span><span class="s2">&gt;= </span><span class="s6">0 </span><span class="s2">&amp;&amp; </span><span class="s1">group</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">j</span><span class="s2">).</span><span class="s1">compareTo</span><span class="s2">(</span><span class="s1">line</span><span class="s2">) &gt; </span><span class="s6">0</span><span class="s2">) {</span>
+                <span class="s1">group</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">j </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">, </span><span class="s1">group</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">j</span><span class="s2">));</span>
+                <span class="s1">j </span><span class="s2">= </span><span class="s1">j </span><span class="s2">- </span><span class="s6">1</span><span class="s2">;</span>
+            <span class="s2">}</span>
+            <span class="s1">group</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">j </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">, </span><span class="s1">line</span><span class="s2">);</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* Performs insertionSort on the separate groups to make sure that the groups are in alphabetical order</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">groups: lists of different anagram sets</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static void </span><span class="s1">groupSort</span><span class="s2">(</span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">groups</span><span class="s2">) {</span>
+        <span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">idx </span><span class="s2">= </span><span class="s6">1</span><span class="s2">; </span><span class="s1">idx </span><span class="s2">&lt; </span><span class="s1">groups</span><span class="s2">.</span><span class="s1">size</span><span class="s2">(); </span><span class="s1">idx</span><span class="s2">++) {</span>
+            <span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">currentGroup </span><span class="s2">= </span><span class="s1">groups</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">idx</span><span class="s2">);</span>
+            <span class="s0">int </span><span class="s1">j </span><span class="s2">= </span><span class="s1">idx </span><span class="s2">- </span><span class="s6">1</span><span class="s2">;</span>
+
+            <span class="s5">// Compare current group's first word with previous groups' first words</span>
+            <span class="s0">while </span><span class="s2">(</span><span class="s1">j </span><span class="s2">&gt;= </span><span class="s6">0 </span><span class="s2">&amp;&amp; </span><span class="s1">compareFirstWords</span><span class="s2">(</span><span class="s1">currentGroup</span><span class="s2">, </span><span class="s1">groups</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">j</span><span class="s2">)) &lt; </span><span class="s6">0</span><span class="s2">) {</span>
+                <span class="s1">groups</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">j </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">, </span><span class="s1">groups</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">j</span><span class="s2">));</span>
+                <span class="s1">j</span><span class="s2">--;</span>
+            <span class="s2">}</span>
+
+            <span class="s1">groups</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">j </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">, </span><span class="s1">currentGroup</span><span class="s2">);</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s3">/**</span>
+     <span class="s3">* sortAnagramsGroups helper method: compares groups based on the first word lexicographically</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">group1 first group being compared in the while loop</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">group2 second group being compared in the while loop</span>
+     <span class="s3">* </span><span class="s4">@return </span><span class="s3">which group should go ahead of the other based on alphebetization</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static int </span><span class="s1">compareFirstWords</span><span class="s2">(</span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">group1</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">group2</span><span class="s2">) {</span>
+        <span class="s1">String word1 </span><span class="s2">= </span><span class="s1">group1</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s6">0</span><span class="s2">);</span>
+        <span class="s1">String word2 </span><span class="s2">= </span><span class="s1">group2</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s6">0</span><span class="s2">);</span>
+        <span class="s0">return </span><span class="s1">word1</span><span class="s2">.</span><span class="s1">compareToIgnoreCase</span><span class="s2">(</span><span class="s1">word2</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+
+    <span class="s3">/**</span>
+     <span class="s3">* Compares anagram groups to find which group has the highest number of anagrams</span>
+     <span class="s3">* Outputs the group, the number of anagrams it contains, and the group in list form</span>
+     <span class="s3">* In the case several groups have the max number of anagrams,</span>
+     <span class="s3">* the number of groups is displayed along with their anagram count and the group themselves</span>
+     <span class="s3">*</span>
+     <span class="s3">* </span><span class="s4">@param </span><span class="s3">map - map being parsed to find anagram groups</span>
+     <span class="s3">*/</span>
+    <span class="s0">private static void </span><span class="s1">findMostAnagrams</span><span class="s2">(</span><span class="s1">MyMap</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">map</span><span class="s2">) {</span>
+        <span class="s0">int </span><span class="s1">maxAnagramCount </span><span class="s2">= </span><span class="s6">0</span><span class="s2">;</span>
+        <span class="s5">//Is the Group count in output</span>
+        <span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">maxAnagramGroups </span><span class="s2">= </span><span class="s0">new </span><span class="s1">MyLinkedList</span><span class="s2">&lt;&gt;();</span>
+        <span class="s5">//Is the lists displayed in output</span>
+
+        <span class="s1">Iterator</span><span class="s2">&lt;</span><span class="s1">Entry</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt;&gt; </span><span class="s1">entryIterator </span><span class="s2">= </span><span class="s1">map</span><span class="s2">.</span><span class="s1">iterator</span><span class="s2">();</span>
+        <span class="s0">while </span><span class="s2">(</span><span class="s1">entryIterator</span><span class="s2">.</span><span class="s1">hasNext</span><span class="s2">()) {</span>
+            <span class="s1">Entry</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">entry </span><span class="s2">= </span><span class="s1">entryIterator</span><span class="s2">.</span><span class="s1">next</span><span class="s2">();</span>
+            <span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">anagramsList </span><span class="s2">= </span><span class="s1">entry</span><span class="s2">.</span><span class="s1">value</span><span class="s2">;</span>
+
+            <span class="s5">//logic to find group with most anagrams, stored in maxAnagramGroups</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">anagramsList</span><span class="s2">.</span><span class="s1">size</span><span class="s2">() &gt; </span><span class="s6">1</span><span class="s2">) {</span>
+                <span class="s0">int </span><span class="s1">currentAnagramCount </span><span class="s2">= </span><span class="s1">anagramsList</span><span class="s2">.</span><span class="s1">size</span><span class="s2">();</span>
+
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">currentAnagramCount </span><span class="s2">&gt; </span><span class="s1">maxAnagramCount</span><span class="s2">) {</span>
+                    <span class="s1">maxAnagramCount </span><span class="s2">= </span><span class="s1">currentAnagramCount</span><span class="s2">;</span>
+                    <span class="s1">maxAnagramGroups</span><span class="s2">.</span><span class="s1">clear</span><span class="s2">();</span>
+                    <span class="s1">maxAnagramGroups</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">anagramsList</span><span class="s2">);</span>
+                <span class="s2">} </span><span class="s0">else if </span><span class="s2">(</span><span class="s1">currentAnagramCount </span><span class="s2">== </span><span class="s1">maxAnagramCount</span><span class="s2">) {</span>
+                    <span class="s1">maxAnagramGroups</span><span class="s2">.</span><span class="s1">add</span><span class="s2">(</span><span class="s1">anagramsList</span><span class="s2">);</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s5">//sorts the max anagram groups alphabetically</span>
+        <span class="s1">groupSort</span><span class="s2">(</span><span class="s1">maxAnagramGroups</span><span class="s2">);</span>
+
+
+        <span class="s5">//1/2 of final output</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">maxAnagramCount </span><span class="s2">== </span><span class="s6">0</span><span class="s2">) {</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;No anagrams found.&quot;</span><span class="s2">);</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;Groups: &quot; </span><span class="s2">+ </span><span class="s1">maxAnagramGroups</span><span class="s2">.</span><span class="s1">size</span><span class="s2">() + </span><span class="s7">&quot;, Anagram count: &quot; </span><span class="s2">+ </span><span class="s1">maxAnagramCount</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+
+        <span class="s1">Iterator</span><span class="s2">&lt;</span><span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt;&gt; </span><span class="s1">iterator </span><span class="s2">= </span><span class="s1">maxAnagramGroups</span><span class="s2">.</span><span class="s1">iterator</span><span class="s2">();</span>
+        <span class="s5">//adds the max anagram groups to what will be shown in the output</span>
+        <span class="s0">while </span><span class="s2">(</span><span class="s1">iterator</span><span class="s2">.</span><span class="s1">hasNext</span><span class="s2">()) {</span>
+            <span class="s1">MyList</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">group </span><span class="s2">= </span><span class="s1">iterator</span><span class="s2">.</span><span class="s1">next</span><span class="s2">();</span>
+            <span class="s5">//sorts the words in each group</span>
+            <span class="s1">insertionSort</span><span class="s2">(</span><span class="s1">group</span><span class="s2">);</span>
+
+
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">print</span><span class="s2">(</span><span class="s7">&quot;[&quot;</span><span class="s2">);</span>
+            <span class="s1">Iterator</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">&gt; </span><span class="s1">wordIterator </span><span class="s2">= </span><span class="s1">group</span><span class="s2">.</span><span class="s1">iterator</span><span class="s2">();</span>
+            <span class="s0">while </span><span class="s2">(</span><span class="s1">wordIterator</span><span class="s2">.</span><span class="s1">hasNext</span><span class="s2">()) {</span>
+                <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">print</span><span class="s2">(</span><span class="s1">wordIterator</span><span class="s2">.</span><span class="s1">next</span><span class="s2">());</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">wordIterator</span><span class="s2">.</span><span class="s1">hasNext</span><span class="s2">()) {</span>
+                    <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">print</span><span class="s2">(</span><span class="s7">&quot;, &quot;</span><span class="s2">);</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+            <span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s7">&quot;]&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>
